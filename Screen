@@ -1,0 +1,67 @@
+-- Loading screen script in Lua ( adaptable for Love2D or similar frameworks)
+
+-- Configuration
+local screenWidth = 800  -- Screen width (adjust based on your setup)
+local screenHeight = 600 -- Screen height (adjust based on your setup)
+local progress = 0       -- Loading progress (0 to 1)
+local dots = ""         -- For animated "Loading..." dots
+local dotTimer = 0      -- Timer for dot animation
+local dotInterval = 0.5 -- Time between dot updates (seconds)
+
+-- Function to initialize the loading screen
+function love.load()
+    -- Set up any initial state (e.g., font, colors)
+    font = love.graphics.newFont(24) -- Default font size 24
+    love.graphics.setFont(font)
+end
+
+-- Function to update the loading screen state
+function love.update(dt)
+    -- Simulate loading progress (replace with actual loading logic)
+    progress = math.min(progress + dt * 0.1, 1) -- Increment progress over time
+
+    -- Update animated dots for "Loading..." text
+    dotTimer = dotTimer + dt
+    if dotTimer >= dotInterval then
+        dotTimer = dotTimer - dotInterval
+        if dots == "..." then
+            dots = ""
+        else
+            dots = dots .. "."
+        end
+    end
+end
+
+-- Function to draw the loading screen
+function love.draw()
+    -- Clear the screen with a dark background
+    love.graphics.setBackgroundColor(0.1, 0.1, 0.1) -- Dark gray background
+    love.graphics.clear()
+
+    -- Draw "Loading..." text with animated dots
+    local loadingText = "Loading" .. dots
+    local textWidth = font:getWidth(loadingText)
+    local textHeight = font:getHeight()
+    love.graphics.setColor(1, 1, 1) -- White text
+    love.graphics.print(loadingText, (screenWidth - textWidth) / 2, screenHeight / 3)
+
+    -- Draw progress bar outline
+    local barWidth = screenWidth * 0.6  -- 60% of screen width
+    local barHeight = 30
+    local barX = (screenWidth - barWidth) / 2
+    local barY = screenHeight / 2
+    love.graphics.setColor(1, 1, 1) -- White outline
+    love.graphics.rectangle("line", barX, barY, barWidth, barHeight)
+
+    -- Draw progress bar fill
+    local fillWidth = barWidth * progress
+    love.graphics.setColor(0, 0.8, 0) -- Green fill
+    love.graphics.rectangle("fill", barX, barY, fillWidth, barHeight)
+end
+
+-- Optional: Handle keypress to simulate skipping or testing
+function love.keypressed(key)
+    if key == "space" then
+        progress = 1 -- Simulate instant completion
+    end
+end
