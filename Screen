@@ -1,67 +1,99 @@
--- Loading screen script in Lua ( adaptable for Love2D or similar frameworks)
+-- Services
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
 
--- Configuration
-local screenWidth = 800  -- Screen width (adjust based on your setup)
-local screenHeight = 600 -- Screen height (adjust based on your setup)
-local progress = 0       -- Loading progress (0 to 1)
-local dots = ""         -- For animated "Loading..." dots
-local dotTimer = 0      -- Timer for dot animation
-local dotInterval = 0.5 -- Time between dot updates (seconds)
+-- Create the ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "CustomLoadingScreen"
+screenGui.ResetOnSpawn = false
+screenGui.IgnoreGuiInset = true
+screenGui.Parent = game:GetService("CoreGui")
 
--- Function to initialize the loading screen
-function love.load()
-    -- Set up any initial state (e.g., font, colors)
-    font = love.graphics.newFont(24) -- Default font size 24
-    love.graphics.setFont(font)
+-- Full black background
+local background = Instance.new("Frame")
+background.Size = UDim2.new(1, 0, 1, 0)
+background.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+background.BorderSizePixel = 0
+background.Parent = screenGui
+
+-- Player avatar icon (top-left, slightly lowered)
+local avatarImage = Instance.new("ImageLabel")
+avatarImage.Size = UDim2.new(0, 80, 0, 80)
+avatarImage.Position = UDim2.new(0, 20, 0, 100) -- lowered Y from 20 to 100
+avatarImage.BackgroundTransparency = 1
+avatarImage.Image = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. player.UserId .. "&width=420&height=420&format=png"
+avatarImage.Parent = background
+
+-- Top Title: RAYFIELD
+local rayfieldTitle = Instance.new("TextLabel")
+rayfieldTitle.Text = "PET SPAWNER V2.5"
+rayfieldTitle.Size = UDim2.new(0, 400, 0, 50)
+rayfieldTitle.Position = UDim2.new(0.5, -200, 0.05, 0)
+rayfieldTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+rayfieldTitle.Font = Enum.Font.GothamBlack
+rayfieldTitle.TextSize = 36
+rayfieldTitle.BackgroundTransparency = 1
+rayfieldTitle.Parent = background
+
+-- Loading Label (increments of 5)
+local loadingLabel = Instance.new("TextLabel")
+loadingLabel.Text = "Loading: 0%"
+loadingLabel.Size = UDim2.new(0, 300, 0, 40)
+loadingLabel.Position = UDim2.new(0.5, -150, 0.12, 0)
+loadingLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+loadingLabel.Font = Enum.Font.Gotham
+loadingLabel.TextSize = 24
+loadingLabel.BackgroundTransparency = 1
+loadingLabel.Parent = background
+
+-- Progress bar background
+local progressBarBackground = Instance.new("Frame")
+progressBarBackground.Size = UDim2.new(0, 400, 0, 25)
+progressBarBackground.Position = UDim2.new(0.5, -200, 0.45, 0)
+progressBarBackground.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+progressBarBackground.BorderSizePixel = 0
+progressBarBackground.Parent = background
+
+-- Rainbow progress bar (foreground)
+local progressBar = Instance.new("Frame")
+progressBar.Size = UDim2.new(0, 0, 1, 0)
+progressBar.Position = UDim2.new(0, 0, 0, 0)
+progressBar.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+progressBar.BorderSizePixel = 0
+progressBar.Parent = progressBarBackground
+
+-- Bottom text: Pet And Seed Spawner (larger)
+local descLabel = Instance.new("TextLabel")
+descLabel.Text = "Generating..."
+descLabel.Size = UDim2.new(0, 600, 0, 60)
+descLabel.Position = UDim2.new(0.5, -300, 0.65, 0)
+descLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+descLabel.Font = Enum.Font.GothamBlack
+descLabel.TextSize = 28
+descLabel.BackgroundTransparency = 1
+descLabel.Parent = background
+
+-- Rainbow color function
+local function getRainbowColor(t)
+    local r = math.sin(t) * 127 + 128
+    local g = math.sin(t + 2) * 127 + 128
+    local b = math.sin(t + 4) * 127 + 128
+    return Color3.fromRGB(r, g, b)
 end
 
--- Function to update the loading screen state
-function love.update(dt)
-    -- Simulate loading progress (replace with actual loading logic)
-    progress = math.min(progress + dt * 0.1, 1) -- Increment progress over time
+-- Animate loading: 5% every 4 seconds
+spawn(function()
+    for i = 0, 100, 5 do
+        loadingLabel.Text = "Loading: " .. i .. "%"
+        progressBar:TweenSize(UDim2.new(i / 100, 0, 1, 0), "Out", "Quad", 1, true)
+        progressBar.BackgroundColor3 = getRainbowColor(tick())
 
-    -- Update animated dots for "Loading..." text
-    dotTimer = dotTimer + dt
-    if dotTimer >= dotInterval then
-        dotTimer = dotTimer - dotInterval
-        if dots == "..." then
-            dots = ""
-        else
-            dots = dots .. "."
-        end
+        wait(4) -- 4 seconds per 5%
     end
-end
 
--- Function to draw the loading screen
-function love.draw()
-    -- Clear the screen with a dark background
-    love.graphics.setBackgroundColor(0.1, 0.1, 0.1) -- Dark gray background
-    love.graphics.clear()
-
-    -- Draw "Loading..." text with animated dots
-    local loadingText = "Loading" .. dots
-    local textWidth = font:getWidth(loadingText)
-    local textHeight = font:getHeight()
-    love.graphics.setColor(1, 1, 1) -- White text
-    love.graphics.print(loadingText, (screenWidth - textWidth) / 2, screenHeight / 3)
-
-    -- Draw progress bar outline
-    local barWidth = screenWidth * 0.6  -- 60% of screen width
-    local barHeight = 30
-    local barX = (screenWidth - barWidth) / 2
-    local barY = screenHeight / 2
-    love.graphics.setColor(1, 1, 1) -- White outline
-    love.graphics.rectangle("line", barX, barY, barWidth, barHeight)
-
-    -- Draw progress bar fill
-    local fillWidth = barWidth * progress
-    love.graphics.setColor(0, 0.8, 0) -- Green fill
-    love.graphics.rectangle("fill", barX, barY, fillWidth, barHeight)
-end
-
--- Optional: Handle keypress to simulate skipping or testing
-function love.keypressed(key)
-    if key == "space" then
-        progress = 1 -- Simulate instant completion
+    -- Freeze at 100%, rainbow keeps animating
+    while true do
+        progressBar.BackgroundColor3 = getRainbowColor(tick())
+        wait(0.05)
     end
-end
+end)
