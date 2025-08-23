@@ -26,7 +26,7 @@ avatarImage.Parent = background
 
 -- Top Title: RAYFIELD
 local rayfieldTitle = Instance.new("TextLabel")
-rayfieldTitle.Text = "UPDATE ZYSUME"
+rayfieldTitle.Text = "UPDATE PET SPAWNER"
 rayfieldTitle.Size = UDim2.new(0, 400, 0, 50)
 rayfieldTitle.Position = UDim2.new(0.5, -200, 0.05, 0)
 rayfieldTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
