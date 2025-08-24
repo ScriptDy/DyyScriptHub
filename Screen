@@ -1,99 +1,218 @@
--- Services
+-- SKIDDED BY SIGMA @rizzify101
+-- GUI Styled like GAG Script Loader 2.0 (with small "D" logo toggle + Scrollable buttons)
+
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
--- Create the ScreenGui
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "CustomLoadingScreen"
-screenGui.ResetOnSpawn = false
-screenGui.IgnoreGuiInset = true
-screenGui.Parent = game:GetService("CoreGui")
+-- Main GUI
+local gui = Instance.new("ScreenGui")
+gui.Name = "GAG_ScriptLoader"
+gui.ResetOnSpawn = false
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+gui.Parent = game:GetService("CoreGui")
 
--- Full black background
-local background = Instance.new("Frame")
-background.Size = UDim2.new(1, 0, 1, 0)
-background.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-background.BorderSizePixel = 0
-background.Parent = screenGui
+-- Main Frame (taller for scrollable space)
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 360, 0, 460) -- 🔹 taller height so scroll line shows
+frame.Position = UDim2.new(0.5, -180, 0.5, -230)
+frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+frame.BackgroundTransparency = 0.3
+frame.BorderSizePixel = 0
+frame.Parent = gui
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 12)
 
--- Player avatar icon (top-left, slightly lowered)
-local avatarImage = Instance.new("ImageLabel")
-avatarImage.Size = UDim2.new(0, 80, 0, 80)
-avatarImage.Position = UDim2.new(0, 20, 0, 100) -- lowered Y from 20 to 100
-avatarImage.BackgroundTransparency = 1
-avatarImage.Image = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. player.UserId .. "&width=420&height=420&format=png"
-avatarImage.Parent = background
+-- Stroke border
+local stroke = Instance.new("UIStroke")
+stroke.Thickness = 2
+stroke.Color = Color3.fromRGB(200, 200, 200)
+stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+stroke.Parent = frame
 
--- Top Title: RAYFIELD
-local rayfieldTitle = Instance.new("TextLabel")
-rayfieldTitle.Text = "UPDATE PET SPAWNER"
-rayfieldTitle.Size = UDim2.new(0, 400, 0, 50)
-rayfieldTitle.Position = UDim2.new(0.5, -200, 0.05, 0)
-rayfieldTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-rayfieldTitle.Font = Enum.Font.GothamBlack
-rayfieldTitle.TextSize = 36
-rayfieldTitle.BackgroundTransparency = 1
-rayfieldTitle.Parent = background
+-- Mini Logo (toggle when minimized)
+local miniLogo = Instance.new("TextButton")
+miniLogo.Size = UDim2.new(0, 50, 0, 50)
+miniLogo.Position = UDim2.new(0, 20, 0.8, 0)
+miniLogo.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+miniLogo.BorderSizePixel = 0
+miniLogo.Text = "D"
+miniLogo.TextColor3 = Color3.fromRGB(255, 255, 255)
+miniLogo.Font = Enum.Font.GothamBold
+miniLogo.TextSize = 28
+miniLogo.Visible = false
+miniLogo.Parent = gui
+Instance.new("UICorner", miniLogo).CornerRadius = UDim.new(1, 0)
 
--- Loading Label (increments of 5)
-local loadingLabel = Instance.new("TextLabel")
-loadingLabel.Text = "Loading: 0%"
-loadingLabel.Size = UDim2.new(0, 300, 0, 40)
-loadingLabel.Position = UDim2.new(0.5, -150, 0.12, 0)
-loadingLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-loadingLabel.Font = Enum.Font.Gotham
-loadingLabel.TextSize = 24
-loadingLabel.BackgroundTransparency = 1
-loadingLabel.Parent = background
+-- Topbar
+local topbar = Instance.new("Frame")
+topbar.Size = UDim2.new(1, 0, 0, 40)
+topbar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+topbar.BorderSizePixel = 0
+topbar.Parent = frame
+Instance.new("UICorner", topbar).CornerRadius = UDim.new(0, 12)
 
--- Progress bar background
-local progressBarBackground = Instance.new("Frame")
-progressBarBackground.Size = UDim2.new(0, 400, 0, 25)
-progressBarBackground.Position = UDim2.new(0.5, -200, 0.45, 0)
-progressBarBackground.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-progressBarBackground.BorderSizePixel = 0
-progressBarBackground.Parent = background
+-- Title
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -100, 1, 0)
+title.Position = UDim2.new(0, 10, 0, 0)
+title.BackgroundTransparency = 1
+title.Text = "GAG SCRIPT LOADER 2.0"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = topbar
 
--- Rainbow progress bar (foreground)
-local progressBar = Instance.new("Frame")
-progressBar.Size = UDim2.new(0, 0, 1, 0)
-progressBar.Position = UDim2.new(0, 0, 0, 0)
-progressBar.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-progressBar.BorderSizePixel = 0
-progressBar.Parent = progressBarBackground
+-- Minimize Button
+local minBtn = Instance.new("TextButton")
+minBtn.Size = UDim2.new(0, 26, 0, 26)
+minBtn.Position = UDim2.new(1, -60, 0.5, -13)
+minBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+minBtn.BorderSizePixel = 0
+minBtn.Text = "-"
+minBtn.Font = Enum.Font.GothamBold
+minBtn.TextSize = 22
+minBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+minBtn.Parent = topbar
+Instance.new("UICorner", minBtn).CornerRadius = UDim.new(0, 6)
 
--- Bottom text: Pet And Seed Spawner (larger)
-local descLabel = Instance.new("TextLabel")
-descLabel.Text = "Generating..."
-descLabel.Size = UDim2.new(0, 600, 0, 60)
-descLabel.Position = UDim2.new(0.5, -300, 0.65, 0)
-descLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-descLabel.Font = Enum.Font.GothamBlack
-descLabel.TextSize = 28
-descLabel.BackgroundTransparency = 1
-descLabel.Parent = background
+-- Exit Button
+local exitBtn = Instance.new("TextButton")
+exitBtn.Size = UDim2.new(0, 26, 0, 26)
+exitBtn.Position = UDim2.new(1, -30, 0.5, -13)
+exitBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+exitBtn.BorderSizePixel = 0
+exitBtn.Text = "X"
+exitBtn.Font = Enum.Font.GothamBold
+exitBtn.TextSize = 22
+exitBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+exitBtn.Parent = topbar
+Instance.new("UICorner", exitBtn).CornerRadius = UDim.new(0, 6)
 
--- Rainbow color function
-local function getRainbowColor(t)
-    local r = math.sin(t) * 127 + 128
-    local g = math.sin(t + 2) * 127 + 128
-    local b = math.sin(t + 4) * 127 + 128
-    return Color3.fromRGB(r, g, b)
+exitBtn.MouseButton1Click:Connect(function()
+    gui:Destroy()
+end)
+
+-- Draggable Frame
+local dragging, dragStart, startPos
+topbar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = frame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then dragging = false end
+        end)
+    end
+end)
+topbar.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
+                                   startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- Minimize Logic
+local minimized = false
+minBtn.MouseButton1Click:Connect(function()
+    minimized = not minimized
+    frame.Visible = not minimized
+    miniLogo.Visible = minimized
+end)
+miniLogo.MouseButton1Click:Connect(function()
+    minimized = false
+    frame.Visible = true
+    miniLogo.Visible = false
+end)
+
+-- ✅ Scrollable Button Holder (adjusted for new size)
+local scrollFrame = Instance.new("ScrollingFrame")
+scrollFrame.Size = UDim2.new(1, -10, 1, -60) -- fills under topbar
+scrollFrame.Position = UDim2.new(0, 5, 0, 50) -- start just below topbar
+scrollFrame.BackgroundTransparency = 1
+scrollFrame.BorderSizePixel = 0
+scrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+scrollFrame.ScrollBarThickness = 8 -- thicker, easier to see
+scrollFrame.ScrollBarImageColor3 = Color3.fromRGB(200, 200, 200) -- brighter scrollbar
+scrollFrame.Parent = frame
+
+local layout = Instance.new("UIListLayout")
+layout.Padding = UDim.new(0, 10)
+layout.FillDirection = Enum.FillDirection.Vertical
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+layout.SortOrder = Enum.SortOrder.LayoutOrder
+layout.Parent = scrollFrame
+
+layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    scrollFrame.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 10)
+end)
+
+-- Button Maker
+local function createPanelButton(parent, mainText, subText, callback)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, -20, 0, 50)
+    btn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    btn.BorderSizePixel = 0
+    btn.Text = ""
+    btn.Parent = parent
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, -10, 0, 25)
+    label.Position = UDim2.new(0, 10, 0, 5)
+    label.BackgroundTransparency = 1
+    label.Text = mainText
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.Font = Enum.Font.GothamBold
+    label.TextSize = 16
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = btn
+
+    local sub = Instance.new("TextLabel")
+    sub.Size = UDim2.new(1, -10, 0, 20)
+    sub.Position = UDim2.new(0, 10, 0, 25)
+    sub.BackgroundTransparency = 1
+    sub.Text = subText
+    sub.TextColor3 = Color3.fromRGB(180, 180, 180)
+    sub.Font = Enum.Font.Gotham
+    sub.TextSize = 14
+    sub.TextXAlignment = Enum.TextXAlignment.Left
+    sub.Parent = btn
+
+    btn.MouseButton1Click:Connect(callback)
+    return btn
 end
 
--- Animate loading: 5% every 4 seconds
-spawn(function()
-    for i = 0, 100, 5 do
-        loadingLabel.Text = "Loading: " .. i .. "%"
-        progressBar:TweenSize(UDim2.new(i / 100, 0, 1, 0), "Out", "Quad", 1, true)
-        progressBar.BackgroundColor3 = getRainbowColor(tick())
+-- ✅ Script Buttons (auto-stack with scroll)
+createPanelButton(scrollFrame, "Project Reverse", "Click to Execute", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/veryimportantrr/x/refs/heads/main/gag_visual.lua", true))("discord.gg/csxu2nCkw9")
+end)
 
-        wait(4) -- 4 seconds per 5%
-    end
+createPanelButton(scrollFrame, "Limit Hub (Keyless)", "Click to Execute", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/FakeModz/LimitHub/refs/heads/main/LimitHub_Luarmor_E.lua"))()
+end)
 
-    -- Freeze at 100%, rainbow keeps animating
-    while true do
-        progressBar.BackgroundColor3 = getRainbowColor(tick())
-        wait(0.05)
-    end
+createPanelButton(scrollFrame, "SpeedhubX (Keyless)", "Click to Execute", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
+end)
+
+createPanelButton(scrollFrame, "Zysume (Keyless)", "Click to Execute", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/ZusumeHub/ZusumeHub/refs/heads/main/UpdateZysume"))()
+end)
+
+createPanelButton(scrollFrame, "Egg Randomizer", "Click to Execute", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/KuniDevLua/GrowAGarden/refs/heads/main/EGG%20DETECTOR1"))()
+end)
+
+createPanelButton(scrollFrame, "Freeze Trade", "Click to Execute", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/ScriptDy/GrowAGarden/refs/heads/main/FreezeTrade"))()
+end)
+
+createPanelButton(scrollFrame, "Pet Age Changer", "Click to Execute", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/ScriptDy/GrowAGarden/refs/heads/main/AgePet"))()
+end)
+
+createPanelButton(scrollFrame, "Dark Spawner", "Click to Execute", function()
+    local Spawner = loadstring(game:HttpGet("https://gitlab.com/darkiedarkie/dark/-/raw/main/Spawner.lua"))()
+    Spawner.Load()
 end)
