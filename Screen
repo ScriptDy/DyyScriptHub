@@ -204,15 +204,15 @@ createPanelButton(scrollFrame, "Egg Randomizer", "Click to Execute", function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/KuniDevLua/GrowAGarden/refs/heads/main/EGG%20DETECTOR1"))()
 end)
 
+createPanelButton(scrollFrame, "Dark Spawner", "Click to Execute", function()
+    local Spawner = loadstring(game:HttpGet("https://gitlab.com/darkiedarkie/dark/-/raw/main/Spawner.lua"))()
+    Spawner.Load()
+end)
+
 createPanelButton(scrollFrame, "Freeze Trade", "Click to Execute", function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/ScriptDy/GrowAGarden/refs/heads/main/FreezeTrade"))()
 end)
 
 createPanelButton(scrollFrame, "Pet Age Changer", "Click to Execute", function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/ScriptDy/GrowAGarden/refs/heads/main/AgePet"))()
-end)
-
-createPanelButton(scrollFrame, "Dark Spawner", "Click to Execute", function()
-    local Spawner = loadstring(game:HttpGet("https://gitlab.com/darkiedarkie/dark/-/raw/main/Spawner.lua"))()
-    Spawner.Load()
 end)
